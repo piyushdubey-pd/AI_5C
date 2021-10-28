@@ -58,12 +58,16 @@ ch=insttt()
 fl=True
 print(ch)
 for i in range(9):
-    while ([x,y] in occ):
-        heeh=input(p[ch]+"choose your coordinates:\n")    
-        temp=heeh.split()
-        print(temp)
     
+    heeh=input(p[ch]+"choose your coordinates:\n")    
+    temp=heeh.split()
+    print(temp)
+    x=int(temp[0])
+    y=int(temp[1])
+    while ([x,y] in occ):
         print("Already filled try again")
+        heeh=input(p[ch]+"choose your coordinates:\n")    
+        temp=heeh.split()        
         x=int(temp[0])
         y=int(temp[1])
     
