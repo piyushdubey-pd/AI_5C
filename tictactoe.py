@@ -1,88 +1,193 @@
-import random as rn
-import time
+import emoji
+player, computer = 'x', 'o'
 
-arr =[[' ',' ',' '], [' ',' ',' '], [' ',' ',' ']]
-p=['','']
-ch=-1
-x=-1
-y=-1
-occ=[]
-def disp():
-    for i in range(3) :
-        print(arr[i][0]+' | '+arr[i][1]+' | '+arr[i][2])
-        if(i!=2):
-            print("--+---+--")
-            
-def insttt():
-    p[0] =input("Enter name of player 1:")
-    p[1] =input("Enter name of player 2:")
-    print("Tossing a coin.....")
-    time.sleep(2)
-    if(rn.randint(0,2)==0):
-        print(p[0]+" will start the game with 'X'\n"+p[1]+" gets 'O'")
-        return 0
+#this function is to check if there are any moves left in the game
+
+def main():
+    board = [
+    [ '', '', '_' ],
+    [ '', '', '_' ],
+    [ '', '', '_' ]
+    ]
+
+    printBoard(board)
+    print("At each turn enter your cell number")
+    print("Cells are numbered from 1 to 9")
+    
+    choice = input("Do you want to play first?\n")
+    if choice.lower() in ["yes", "y", "yeah"]:
+        k = 0
+        while(k < 5):
+            k += 1
+            print("Your Turn:")
+            cell = int(input("Cell Number: "))
+            if(cell <= 0 or cell > 9):
+                print("Enter a valid cell number")
+                k -= 1
+                continue
+            cell -= 1
+            i = cell // 3
+            j = cell % 3
+            if(board[i][j] != '_'):
+                print("Cell occupied")
+                k -= 1
+                continue
+            board[i][j] = player
+            printBoard(board)
+            if(evaluate(board) == 10):
+                print("YOU WIN!!!", "\U0001f600")
+                return
+            if(k == 4 and evaluate(board) == 0):
+                print("DRAW!!!")
+                return
+            print("Computer's Turn")
+            bestMove = findBestMove(board)
+            i = bestMove[0]
+            j = bestMove[1]
+            board[i][j] = computer
+            printBoard(board)
+
+            if(evaluate(board) == -10):
+                print("YOU LOOSE!", emoji.emojize(":zipper-mouth_face:"))
+                return
+
+    elif choice.lower() in ["no", "n", "nah"]:
+        k = 0
+        while(k < 5):
+            k += 1
+            print("Computer's Turn")
+            bestMove = findBestMove(board)
+            i = bestMove[0]
+            j = bestMove[1]
+            board[i][j] = computer
+            printBoard(board)
+            if(evaluate(board) == -10):
+                print("YOU LOOSE!", emoji.emojize(":zipper-mouth_face:"))
+                return
+            if(k == 4 and evaluate(board) == 0):
+                print("DRAW!!!")
+                return
+            print("Your Turn:")
+            while(True):
+                cell = int(input("Cell Number: "))
+                if(cell <= 0 or cell > 9):
+                    print("Enter a valid cell number")
+                    continue
+                cell -= 1
+                i = cell // 3
+                j = cell % 3
+                if(board[i][j] != '_'):
+                    print("Cell occupied")
+                    continue
+                else:
+                    break
+            board[i][j] = player
+            printBoard(board)
+            if(evaluate(board) == 10):
+                print("YOU WIN!!!", "\U0001f600")
+                return
     else:
-        print(p[1]+" will start the game with 'X'\n"+p[0]+" gets 'O'")
-        return 1
+        print("GAME ENDS as you did not enter a valid choice")
 
-def check():
-	
-    if(arr[0][1]==arr[0][0] and arr[0][0]==arr[0][2]):
-        if(arr[0][1] !=' '): 
-            return True
-    if(arr[1][1]==arr[1][0] and arr[1][0]==arr[1][2]):
-        if(arr[1][1] !=' '):
-            return True
-    if(arr[2][1]==arr[2][0] and arr[2][0]==arr[2][2]):
-        if(arr[2][1] !=' '):
-            return True
-    if(arr[1][0]==arr[2][0] and arr[2][0]==arr[1][0]):
-        if(arr[1][0] !=' '):
-            return True
-    if(arr[1][1]==arr[2][1] and arr[2][1]==arr[1][0]):
-        if(arr[1][1] !=' '):
-            return True
-    if(arr[1][2]==arr[2][2] and arr[2][2]==arr[1][2]):
-        if(arr[1][2] !=' '):
-            return True
-    if(arr[0][0]==arr[1][1] and arr[1][1]==arr[2][2]):
-        if(arr[0][0] !=' '):
-            return True
-    if(arr[2][0]==arr[1][1] and arr[1][1]==arr[0][2]):
-        if(arr[2][0] !=' '):
-            return True
+
+def printBoard(b):
+    for i in range(3):
+        print(b[i])
+
+def isMovesLeft(board):
+    for i in range(3):
+        for j in range(3):
+            if(board[i][j] == '_'):
+                return True
     return False
 
+#evaluation function
 
-ch=insttt()
-fl=True
-print(ch)
-for i in range(9):
-    
-    heeh=input(p[ch]+"choose your coordinates:\n")    
-    temp=heeh.split()
-    print(temp)
-    x=int(temp[0])
-    y=int(temp[1])
-    while ([x,y] in occ):
-        print("Already filled try again")
-        heeh=input(p[ch]+"choose your coordinates:\n")    
-        temp=heeh.split()        
-        x=int(temp[0])
-        y=int(temp[1])
-    
-    occ.append([x,y])
-    if(fl):
-        arr[x][y]='X'
+def evaluate(b):
+    for row in range(3):
+        if (b[row][0] == b[row][1] and b[row][1] == b[row][2]):
+            if (b[row][0] == player) :
+                return 10
+            elif (b[row][0] == computer) :
+                return -10
+
+    for col in range(3):
+        if (b[0][col] == b[1][col] and b[1][col] == b[2] [col]):
+            if(b[0][col] == player):
+                return 10
+            elif (b[0][col] == computer):
+                    return -10
+
+    if (b[0][0] == b[1][1] and b[1][1] == b[2][2]):
+        if(b[0][0] == player):
+            return 10
+        elif (b[0][0] == computer) :
+            return -10
+
+    if (b[0][2] == b[1][1] and b[1][1] == b[2][0]):
+        if(b[0][2] == player):
+            return 10
+        elif (b[0][2] == computer) :
+            return -10
+
+    return 0
+
+#this is the minimax function. t considers all the possible ways the game can go
+#and returns the value of the board
+
+def minimax(board, depth, isMax):
+    score = evaluate(board)
+    if (score == 10):
+        return score
+    elif (score == -10):
+        return score
+
+    if(isMovesLeft(board) == False) :
+        return 0
+
+    if (isMax) :
+        best = -1000
+        for i in range(3):
+            for j in range(3):
+                if(board[i][j]=='_'):
+                    board[i][j] = player
+
+                    best=max(best, minimax(board, depth + 1, not isMax))
+
+                    board[i][j] = '_'
+        return best
     else:
-        arr[x][y]='O'
-    fl= not fl
-    ch=(ch+1)%2
-    disp()
-    if(check()):
-        print(p[ch]+" wins the game!!!")
-        break
-    
+        best = 1000
+        for i in range(3):
+            for j in range(3):
+                if(board[i][j] == '_'):
+                    board[i][j] = computer
+                    best=min(best, minimax(board, depth + 1, not isMax))
+                    board[i][j] = '_'
+        return best
+
+#this will return the best possible move for a computer
+
+def findBestMove(board):
+    bestVal = 1000
+    bestMove = (-1, -1)
+
+    for i in range(3):
+        for j in range(3):
+
+            if(board[i][j] == '_'):
+
+                board[i][j] = computer
+
+                moveVal = minimax(board, 0, True)
+
+                board[i][j] = '_'
+
+                if(moveVal < bestVal):
+                    bestMove = (i, j)
+                    bestVal = moveVal
+
+    return bestMove
 
 
-
+main()
